@@ -48,11 +48,11 @@ def read_master():
 
 
 def main(argv):
-    master_addrs, master_port = read_master()
+    master_addrs, master_port = "127.0.0.1", 1234
 
     nproc_per_node = 4
-    nnodes = 2
-    node_rank = FLAGS.task_index
+    nnodes = 1
+    node_rank = 0
 
     job_name = FLAGS.job_name
     if job_name == PS_JOB_NAME:
