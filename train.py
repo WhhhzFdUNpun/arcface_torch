@@ -22,7 +22,7 @@ from torch.distributed.elastic.multiprocessing.errors import record
 @record
 def main(args):
     cfg = get_config(args.config)
-    os.environ['NCCL_DEBUG'] = 'INFO'
+    os.environ['NCCL_DEBUG'] = 'WARN'
     try:
         world_size = int(os.environ['WORLD_SIZE'])
         rank = int(os.environ['RANK'])
