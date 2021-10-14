@@ -23,7 +23,7 @@ def main(args):
     try:
         world_size = int(os.environ['WORLD_SIZE'])
         rank = int(os.environ['RANK'])
-        dist.init_process_group('nccl')
+        dist.init_process_group('nccl', init_method='env://')  # https://cloud.google.com/ai-platform/training/docs/distributed-pytorch
     except KeyError:
         world_size = 1
         rank = 0

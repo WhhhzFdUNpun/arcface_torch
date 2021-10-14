@@ -48,8 +48,8 @@ def read_master():
 
 
 def main(argv):
-    master_addrs, master_port = read_master()
-
+    _, master_port = read_master()
+    master_addrs = '127.0.0.1'
     nproc_per_node = 4
     nnodes = 1
     node_rank = 0
