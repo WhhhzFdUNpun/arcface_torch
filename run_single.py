@@ -48,8 +48,7 @@ def read_master():
 
 
 def main(argv):
-    _, master_port = read_master()
-    master_addrs = '127.0.0.1'
+    master_addrs, master_port = read_master()
     nproc_per_node = 4
     nnodes = 1
     node_rank = 0
@@ -62,7 +61,7 @@ def main(argv):
             f'--nproc_per_node={nproc_per_node}',
             f'--nnodes={nnodes}',
             f'--node_rank={node_rank}',
-            f'--master_addr="{master_addrs}"',
+            f'--master_addr={master_addrs}',
             f'--master_port={master_port}',
             'train.py',
             'configs/webface_r18.py']
@@ -89,4 +88,8 @@ def entry(datasets=None, checkpoint_path=None, restore_file_path=None):
 
 
 if __name__ == "__main__":
-    entry()
+    FLAGS.ps_hosts = ''
+    FLAGS.worker_hosts = '127.0.0.1:30000'
+    FLAGS.job_name = WORKER_JOB_NAME
+    FLAGS.task_index = 0
+    main([])
