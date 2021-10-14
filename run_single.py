@@ -52,9 +52,9 @@ def read_nnodes():
     return len(FLAGS.worker_hosts.split(','))
 
 
-def main(argv):
+def main(argv, nproc_per_node):
     master_addrs, master_port = read_master()
-    nproc_per_node = torch.cuda.device_count()
+    nproc_per_node = nproc_per_node or torch.cuda.device_count()
     nnodes = read_nnodes()
     node_rank = 0
 
@@ -74,8 +74,8 @@ def main(argv):
         runpy.run_module('torch.distributed.run', run_name='__main__')
 
 
-def entry(datasets=None, checkpoint_path=None, restore_file_path=None):
-    print(f"entry: datasets {datasets} , checkpoint_path {checkpoint_path}")
+def entry(datasets=None, checkpoint_path=None, restore_file_path=None, nproc_per_node=None):
+    print(f"entry: datasets {datasets} , checkpoint_path {checkpoint_path}, nproc_per_node {nproc_per_node}" )
 
     FLAGS.ps_hosts = os.environ['PS_HOSTS']
     FLAGS.worker_hosts = os.environ['WORKER_HOSTS']
@@ -89,7 +89,7 @@ def entry(datasets=None, checkpoint_path=None, restore_file_path=None):
         FLAGS.restore_file_path = restore_file_path
 
     print(FLAGS)
-    main(argv=[sys.argv[0]] + unparsed)
+    main(argv=[sys.argv[0]] + unparsed, nproc_per_node=nproc_per_node)
 
 
 if __name__ == "__main__":
