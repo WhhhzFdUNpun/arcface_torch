@@ -16,8 +16,10 @@ from utils.utils_amp import MaxClipGradScaler
 from utils.utils_callbacks import CallBackVerification, CallBackLogging, CallBackModelCheckpoint
 from utils.utils_config import get_config
 from utils.utils_logging import AverageMeter, init_logging
+from torch.distributed.elastic.multiprocessing.errors import record
 
 
+@record
 def main(args):
     cfg = get_config(args.config)
     os.environ['NCCL_DEBUG'] = 'INFO'

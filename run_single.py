@@ -71,7 +71,7 @@ def main(argv):
             'train.py',
             'configs/webface_r18.py']
         print(sys.argv)
-        runpy.run_module('torch.distributed.launch', run_name='__main__')
+        runpy.run_module('torch.distributed.run', run_name='__main__')
 
 
 def entry(datasets=None, checkpoint_path=None, restore_file_path=None):
