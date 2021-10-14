@@ -20,6 +20,7 @@ from utils.utils_logging import AverageMeter, init_logging
 
 def main(args):
     cfg = get_config(args.config)
+    os.environ['NCCL_DEBUG'] = 'INFO'
     try:
         world_size = int(os.environ['WORLD_SIZE'])
         rank = int(os.environ['RANK'])

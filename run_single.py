@@ -3,6 +3,7 @@
 import os
 import runpy
 import sys
+import torch
 
 rabbitUri = ''
 
@@ -47,10 +48,14 @@ def read_master():
     return master_addrs, master_port
 
 
+def read_nnodes():
+    return len(FLAGS.worker_hosts.split(','))
+
+
 def main(argv):
     master_addrs, master_port = read_master()
-    nproc_per_node = 4
-    nnodes = 1
+    nproc_per_node = torch.cuda.device_count()
+    nnodes = read_nnodes()
     node_rank = 0
 
     job_name = FLAGS.job_name
