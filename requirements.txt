@@ -4,9 +4,9 @@ mxnet  # ==1.8.0.post0
 onnx  # ==1.10.1
 scikit-learn  # ==1.0
 tensorboard  # ==2.6.0
-torch>=1.9.0
-torchvision>=0.10.0
-torchaudio>=0.9.0
+torch==1.9.0
+torchvision==0.10.0
+torchaudio==0.9.0
 
 # Torch
 # --find-links https://download.pytorch.org/whl/torch_stable.html
