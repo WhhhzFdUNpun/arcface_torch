@@ -56,7 +56,7 @@ def main(argv, nproc_per_node=None):
     master_addrs, master_port = read_master()
     nproc_per_node = nproc_per_node or torch.cuda.device_count()
     nnodes = read_nnodes()
-    node_rank = 0
+    node_rank = FLAGS.task_index
 
     job_name = FLAGS.job_name
     if job_name == PS_JOB_NAME:
