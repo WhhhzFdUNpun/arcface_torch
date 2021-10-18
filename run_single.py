@@ -53,7 +53,7 @@ def read_nnodes():
     return len(FLAGS.worker_hosts.split(','))
 
 
-def main(argv, nproc_per_node=None):
+def main(argv, config_file='webface_r18_512', nproc_per_node=None):
     master_addrs, master_port = read_master()
     nproc_per_node = nproc_per_node or torch.cuda.device_count()
     nnodes = read_nnodes()
@@ -72,12 +72,18 @@ def main(argv, nproc_per_node=None):
             f'--master_addr={master_addrs}',
             f'--master_port={master_port}',
             'train.py',
-            'configs/webface_r18.py']
+            f'configs/{config_file}.py']
         print(sys.argv)
         runpy.run_module('torch.distributed.run', run_name='__main__')
 
 
-def entry(datasets=None, checkpoint_path=None, restore_file_path=None, nproc_per_node=None):
+def entry(
+    datasets=None,
+    checkpoint_path=None,
+    restore_file_path=None,
+    nproc_per_node=None,
+    config_file='webface_r18_512',
+) -> None:
     print(f"entry: datasets {datasets} , checkpoint_path {checkpoint_path}, nproc_per_node {nproc_per_node}" )
 
     FLAGS.ps_hosts = os.environ['PS_HOSTS']
@@ -92,7 +98,7 @@ def entry(datasets=None, checkpoint_path=None, restore_file_path=None, nproc_per
         FLAGS.restore_file_path = restore_file_path
 
     print(FLAGS)
-    main(argv=[sys.argv[0]] + unparsed, nproc_per_node=nproc_per_node)
+    main(argv=[sys.argv[0]] + unparsed, config_file=config_file, nproc_per_node=nproc_per_node)
 
 
 if __name__ == "__main__":
