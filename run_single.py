@@ -3,6 +3,8 @@
 import os
 import runpy
 import sys
+import time
+
 import torch
 
 rabbitUri = ''
@@ -61,7 +63,9 @@ def main(argv, nproc_per_node=None):
 
     job_name = FLAGS.job_name
     if job_name == PS_JOB_NAME:
-        print('no idea')
+        while True:
+            time.sleep(60)
+            print('I\'m still alive')
     elif job_name == WORKER_JOB_NAME:
         sys.argv[1:] = [
             f'--nproc_per_node={nproc_per_node}',
