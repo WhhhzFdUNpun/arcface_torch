@@ -9,7 +9,7 @@ rabbitUri = ''
 
 PS_JOB_NAME = "ps"
 WORKER_JOB_NAME = "worker"
-
+os.environ['NCCL_DEBUG'] = 'WARN'
 
 # FLAGS and unparsed declared below configure_parse_arguments()
 
