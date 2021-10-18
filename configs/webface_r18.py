@@ -8,7 +8,7 @@ config = edict()
 config.loss = "arcface"
 config.network = "r18"
 config.resume = False
-config.output = "/output/webface_arcface_r18"
+config.output = "/output"
 
 config.dataset = "webface"
 config.embedding_size = 512

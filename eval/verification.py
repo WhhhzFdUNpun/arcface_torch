@@ -196,6 +196,7 @@ def evaluate(embeddings, actual_issame, nrof_folds=10, pca=0):
                                       nrof_folds=nrof_folds)
     return tpr, fpr, accuracy, val, val_std, far
 
+
 @torch.no_grad()
 def load_bin(path, image_size):
     try:
@@ -222,6 +223,7 @@ def load_bin(path, image_size):
             print('loading bin', idx)
     print(data_list[0].shape)
     return data_list, issame_list
+
 
 @torch.no_grad()
 def test(data_set, backbone, batch_size, nfolds=10):

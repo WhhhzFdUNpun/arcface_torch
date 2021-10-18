@@ -52,7 +52,7 @@ def read_nnodes():
     return len(FLAGS.worker_hosts.split(','))
 
 
-def main(argv, nproc_per_node):
+def main(argv, nproc_per_node=None):
     master_addrs, master_port = read_master()
     nproc_per_node = nproc_per_node or torch.cuda.device_count()
     nnodes = read_nnodes()
