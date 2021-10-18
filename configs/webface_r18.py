@@ -8,7 +8,7 @@ config = edict()
 config.loss = "arcface"
 config.network = "r18"
 config.resume = False
-config.output = "/output"
+config.output = "/output/webface_r18_512"
 
 config.dataset = "webface"
 config.embedding_size = 512
@@ -16,7 +16,7 @@ config.sample_rate = 1
 config.fp16 = False
 config.momentum = 0.9
 config.weight_decay = 5e-4
-config.batch_size = 64
+config.batch_size = 512
 config.lr = 0.1  # batch size is 512
 
 config.rec = "/data"
