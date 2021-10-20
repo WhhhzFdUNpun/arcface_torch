@@ -16,14 +16,13 @@ config.sample_rate = 1
 config.fp16 = False
 config.momentum = 0.9
 config.weight_decay = 5e-4
-config.batch_size = 96
+config.batch_size = 64
 config.lr = 0.1  # batch size is 512
 
 config.rec = "/data"
 config.num_classes = 10572
 config.num_image = "forget"
 config.num_epoch = 50
-# config.num_epoch = 34
 config.warmup_epoch = -1
 # config.decay_epoch = [20, 28, 32]
 config.decay_epoch = [20, 30, 40]
