@@ -7,6 +7,7 @@ import torch.distributed as dist
 import torch.nn.functional as F
 import torch.utils.data.distributed
 from torch.nn.utils import clip_grad_norm_
+import torch.backends.cudnn
 
 import losses
 from backbones import get_model
@@ -134,7 +135,7 @@ def main(args):
             callback_verification(global_step, backbone)
             scheduler_backbone.step()
             scheduler_pfc.step()
-        callback_checkpoint(global_step, backbone, module_partial_fc)
+        callback_checkpoint(epoch, backbone, module_partial_fc)
     dist.destroy_process_group()
 
 
