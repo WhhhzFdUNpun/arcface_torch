@@ -21,6 +21,7 @@ from torch.distributed.elastic.multiprocessing.errors import record
 
 @record
 def main(args):
+    print('Welcome to ArcFace')
     cfg = get_config(args.config)
     os.environ['NCCL_DEBUG'] = 'WARN'
     try:

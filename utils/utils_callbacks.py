@@ -34,12 +34,14 @@ class CallBackVerification(object):
             results.append(acc2)
 
     def init_dataset(self, val_targets, data_dir, image_size):
+        print('Dataset initialization')
         for name in val_targets:
             path = os.path.join(data_dir, name + ".bin")
             if os.path.exists(path):
                 data_set = verification.load_bin(path, image_size)
                 self.ver_list.append(data_set)
                 self.ver_name_list.append(name)
+        print('Dataset initialization completed')
 
     def __call__(self, num_update, backbone: torch.nn.Module):
         if self.rank == 0 and num_update > 0 and num_update % self.frequent == 0:
