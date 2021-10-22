@@ -22,7 +22,7 @@ from torch.distributed.elastic.multiprocessing.errors import record
 
 @record
 def main(args):
-    print('Welcome to ArcFace')
+    logging.info('Welcome to ArcFace')
     cfg = get_config(args.config)
     os.environ['NCCL_DEBUG'] = 'WARN'
     try:
@@ -42,7 +42,6 @@ def main(args):
     if cfg.rec == "synthetic":
         train_set = SyntheticDataset(local_rank=local_rank)
     else:
-        print(cfg.rec, os.path.isdir(cfg.rec))
         train_set = MXFaceDataset(root_dir=cfg.rec, local_rank=local_rank)
 
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_set, shuffle=True)
@@ -135,7 +134,7 @@ def main(args):
             callback_verification(global_step, backbone)
             scheduler_backbone.step()
             scheduler_pfc.step()
-        callback_checkpoint(epoch, backbone, module_partial_fc)
+        callback_checkpoint(global_step, backbone, module_partial_fc)
     dist.destroy_process_group()
 
 
