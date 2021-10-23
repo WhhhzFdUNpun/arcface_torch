@@ -26,4 +26,4 @@ config.num_epoch = 50
 config.warmup_epoch = -1
 # config.decay_epoch = [20, 28, 32]
 config.decay_epoch = [20, 30, 40]
-config.val_targets = ["lfw", "cfp_fp", "agedb_30"]
+config.val_targets = ["agedb_30", "dev_00", "dev_01", "dev_02", "dev_03", "lfw", "cfp_fp"]
