@@ -7,6 +7,7 @@ import torch.distributed as dist
 import torch.nn.functional as F
 import torch.utils.data.distributed
 from torch.nn.utils import clip_grad_norm_
+import torch.backends.cudnn
 
 import losses
 from backbones import get_model
@@ -21,6 +22,7 @@ from torch.distributed.elastic.multiprocessing.errors import record
 
 @record
 def main(args):
+    logging.info('Welcome to ArcFace')
     cfg = get_config(args.config)
     os.environ['NCCL_DEBUG'] = 'WARN'
     try:
@@ -40,7 +42,6 @@ def main(args):
     if cfg.rec == "synthetic":
         train_set = SyntheticDataset(local_rank=local_rank)
     else:
-        print(cfg.rec, os.path.isdir(cfg.rec))
         train_set = MXFaceDataset(root_dir=cfg.rec, local_rank=local_rank)
 
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_set, shuffle=True)

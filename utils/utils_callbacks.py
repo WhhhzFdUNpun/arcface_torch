@@ -34,12 +34,14 @@ class CallBackVerification(object):
             results.append(acc2)
 
     def init_dataset(self, val_targets, data_dir, image_size):
+        logging.info('Dataset initialization')
         for name in val_targets:
             path = os.path.join(data_dir, name + ".bin")
             if os.path.exists(path):
                 data_set = verification.load_bin(path, image_size)
                 self.ver_list.append(data_set)
                 self.ver_name_list.append(name)
+        logging.info('Dataset initialization completed')
 
     def __call__(self, num_update, backbone: torch.nn.Module):
         if self.rank == 0 and num_update > 0 and num_update % self.frequent == 0:
@@ -107,9 +109,14 @@ class CallBackModelCheckpoint(object):
         self.rank: int = rank
         self.output: str = output
 
-    def __call__(self, global_step, backbone, partial_fc, ):
+    def __call__(self, global_step, backbone, partial_fc, epoch):
         if global_step > 100 and self.rank == 0:
             path_module = os.path.join(self.output, "backbone.pth")
+            torch.save(backbone.module.state_dict(), path_module)
+            logging.info("Pytorch Model Saved in '{}'".format(path_module))
+
+        if epoch % 10 == 0:
+            path_module = os.path.join(self.output, f"backbone_{epoch:03d}.pth")
             torch.save(backbone.module.state_dict(), path_module)
             logging.info("Pytorch Model Saved in '{}'".format(path_module))
 
