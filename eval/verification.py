@@ -274,7 +274,7 @@ def test(data_set, backbone, batch_size, nfolds=10):
     return acc1, std1, acc2, std2, _xnorm, embeddings_list
 
 
-def dumpR(data_set,
+"""def dumpR(data_set,
           backbone,
           batch_size,
           name='',
@@ -318,7 +318,7 @@ def dumpR(data_set,
     with open(outname, 'wb') as f:
         pickle.dump((embeddings, issame_list),
                     f,
-                    protocol=pickle.HIGHEST_PROTOCOL)
+                    protocol=pickle.HIGHEST_PROTOCOL)"""
 
 
 # if __name__ == '__main__':
