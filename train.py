@@ -134,7 +134,7 @@ def main(args):
             callback_verification(global_step, backbone)
             scheduler_backbone.step()
             scheduler_pfc.step()
-        callback_checkpoint(global_step, backbone, module_partial_fc)
+        callback_checkpoint(global_step, backbone, module_partial_fc, epoch)
     dist.destroy_process_group()
 
 
