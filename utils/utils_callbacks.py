@@ -1,8 +1,11 @@
 import logging
+import math
 import os
+import subprocess
 import time
+from pathlib import Path
 from typing import List
-
+from zipfile import ZipFile
 import torch
 
 from eval import verification
@@ -26,11 +29,13 @@ class CallBackVerification(object):
             acc1, std1, acc2, std2, xnorm, embeddings_list = verification.test(
                 self.ver_list[i], backbone, 10, 10)
             logging.info('[%s][%d]XNorm: %f' % (self.ver_name_list[i], global_step, xnorm))
-            logging.info('[%s][%d]Accuracy-Flip: %1.5f+-%1.5f' % (self.ver_name_list[i], global_step, acc2, std2))
+            logging.info('[%s][%d]Accuracy-Flip: %1.5f+-%1.5f' % (
+            self.ver_name_list[i], global_step, acc2, std2))
             if acc2 > self.highest_acc_list[i]:
                 self.highest_acc_list[i] = acc2
             logging.info(
-                '[%s][%d]Accuracy-Highest: %1.5f' % (self.ver_name_list[i], global_step, self.highest_acc_list[i]))
+                '[%s][%d]Accuracy-Highest: %1.5f' % (
+                self.ver_name_list[i], global_step, self.highest_acc_list[i]))
             results.append(acc2)
 
     def init_dataset(self, val_targets, data_dir, image_size):
@@ -86,13 +91,13 @@ class CallBackLogging(object):
                     self.writer.add_scalar('learning_rate', learning_rate, global_step)
                     self.writer.add_scalar('loss', loss.avg, global_step)
                 if fp16:
-                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.4f   Epoch: %d   Global Step: %d   " \
+                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.7f   Epoch: %d   Global Step: %d   " \
                           "Fp16 Grad Scale: %2.f   Required: %1.f hours" % (
                               speed_total, loss.avg, learning_rate, epoch, global_step,
                               grad_scaler.get_scale(), time_for_end
                           )
                 else:
-                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.4f   Epoch: %d   Global Step: %d   " \
+                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.7f   Epoch: %d   Global Step: %d   " \
                           "Required: %1.f hours" % (
                               speed_total, loss.avg, learning_rate, epoch, global_step, time_for_end
                           )
@@ -122,3 +127,55 @@ class CallBackModelCheckpoint(object):
 
         if global_step > 100 and partial_fc is not None:
             partial_fc.save_params()
+
+
+class CallbackModelSplitZipCheckpoint:
+
+    @classmethod
+    def _remove_source_file(cls, source_file: Path):
+        source_file.unlink()
+
+    def _to_zip(self, source_file: Path, destination_folder: Path):
+        archive_head = f'{source_file.stem}{source_file.suffix.replace(".", "_")}.zip'
+
+        logging.info(
+            f'Zipping {source_file} as {destination_folder / archive_head} '
+            f'in {self.split_size} chunks'
+        )
+        cmd_zip = [
+            'zip', '-s', f'{self.split_size}m', destination_folder / archive_head, source_file,
+        ]
+        proc = subprocess.Popen(
+            cmd_zip,
+            shell=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        out, err = proc.communicate()
+
+        if out:
+            logging.info(out)
+        if err:
+            logging.warning(err)
+
+    def __init__(self, rank, output="./", split_size=90):
+        self.output = Path(output)
+        self.rank = rank
+        self.split_size = split_size
+
+    def _make_git_ignore(self):
+        with open(os.path.join(self.output, '.gitignore'), 'wt') as gitignore:
+            gitignore.write('*.pth\n')
+
+    def __call__(self):
+        if self.rank != 0:
+            return
+        self._make_git_ignore()
+        for file in Path(self.output).iterdir():
+            if file.suffix == '.pth':
+                self._to_zip(file, self.output)
+
+
+if __name__ == '__main__':
+    s = '/home/agata/projects/pimeyes/arcface_torch/output/webface_r18_512'
+    CallbackModelSplitZipCheckpoint(0, s)()
