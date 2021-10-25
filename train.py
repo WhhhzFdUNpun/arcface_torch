@@ -14,8 +14,8 @@ from backbones import get_model
 from dataset import MXFaceDataset, SyntheticDataset, DataLoaderX
 from partial_fc import PartialFC
 from utils.utils_amp import MaxClipGradScaler
-from utils.utils_callbacks import CallBackVerification, CallBackLogging, CallBackModelCheckpoint, \
-    CallbackModelSplitZipCheckpoint
+from utils.utils_callbacks import (
+    CallBackVerification, CallBackLogging, CallBackModelCheckpoint, CallbackModelSplitCheckpoint)
 from utils.utils_config import get_config
 from utils.utils_logging import AverageMeter, init_logging
 from torch.distributed.elastic.multiprocessing.errors import record
@@ -136,7 +136,7 @@ def main(args):
             scheduler_backbone.step()
             scheduler_pfc.step()
         callback_checkpoint(global_step, backbone, module_partial_fc, epoch)
-    CallbackModelSplitZipCheckpoint(rank, cfg.output)()
+    CallbackModelSplitCheckpoint(rank, cfg.output)()
     dist.destroy_process_group()
 
 

@@ -129,36 +129,26 @@ class CallBackModelCheckpoint(object):
             partial_fc.save_params()
 
 
-class CallbackModelSplitZipCheckpoint:
+class CallbackModelSplitCheckpoint:
 
     @classmethod
     def _remove_source_file(cls, source_file: Path):
         source_file.unlink()
 
-    def _to_zip(self, source_file: Path, destination_folder: Path):
-        archive_head = f'{source_file.stem}{source_file.suffix.replace(".", "_")}.zip'
+    def _split(self, source_file: Path, destination_folder: Path):
+        archive_head = f'{source_file.stem}{source_file.suffix.replace(".", "_")}'
 
-        logging.info(
-            f'Zipping {source_file} as {destination_folder / archive_head} '
-            f'in {self.split_size} chunks'
-        )
-        cmd_zip = [
-            'zip', '-s', f'{self.split_size}m', destination_folder / archive_head, source_file,
-        ]
-        proc = subprocess.Popen(
-            cmd_zip,
-            shell=False,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        out, err = proc.communicate()
+        with source_file.open('rb') as input_file:
+            part_idx = 0
+            chunk = input_file.read(self.split_size)
+            while chunk:
+                chunk_file_path = destination_folder.joinpath(f'{archive_head}.{part_idx:03d}')
+                with chunk_file_path.open('wb') as chunk_file:
+                    chunk_file.write(chunk)
+                part_idx += 1
+                chunk = input_file.read(self.split_size)
 
-        if out:
-            logging.info(out)
-        if err:
-            logging.warning(err)
-
-    def __init__(self, rank, output="./", split_size=90):
+    def __init__(self, rank, output="./", split_size=90000000):
         self.output = Path(output)
         self.rank = rank
         self.split_size = split_size
@@ -173,7 +163,7 @@ class CallbackModelSplitZipCheckpoint:
         self._make_git_ignore()
         for file in Path(self.output).iterdir():
             if file.suffix == '.pth':
-                self._to_zip(file, self.output)
+                self._split(file, self.output)
 
 
 if __name__ == '__main__':
