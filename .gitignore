@@ -1,3 +1,4 @@
 .idea/
 output/
 /configs/*_local.py
+__pycache__/
