@@ -24,5 +24,5 @@ config.num_classes = 10572
 config.num_image = "forget"
 config.num_epoch = 50
 config.warmup_epoch = -1
-config.decay_epoch = [20, 30, 40]
-config.val_targets = ["lfw", "cfp_fp", "agedb_30"]
+config.decay_epoch = []
+config.val_targets = ["agedb_30", "dev_00", "dev_04"]
