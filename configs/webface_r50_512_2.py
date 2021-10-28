@@ -11,7 +11,7 @@ config.loss = "arcface"
 config.network = "r50"
 config.resume = True
 config.resume_file = '/pretrained/backbone.pth'
-config.output = f"/output/{Path(__file__).resolve().stem}"
+config.output = f"/output/webface_r50_512_3"
 
 config.dataset = "webface"
 config.embedding_size = 512
