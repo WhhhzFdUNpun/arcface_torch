@@ -53,7 +53,7 @@ def main(args):
 
     if cfg.resume:
         try:
-            backbone_pth = os.path.join(cfg.output, "backbone.pth")
+            backbone_pth = os.path.join(cfg.resume_file)
             backbone.load_state_dict(torch.load(backbone_pth, map_location=torch.device(local_rank)))
             if rank == 0:
                 logging.info("backbone resume successfully!")

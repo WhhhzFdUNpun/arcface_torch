@@ -3,6 +3,7 @@ import math
 import os
 import subprocess
 import time
+from collections import defaultdict
 from pathlib import Path
 from typing import List
 from zipfile import ZipFile
@@ -165,7 +166,33 @@ class CallbackModelSplitCheckpoint:
             if file.suffix == '.pth':
                 self._split(file, self.output)
 
+    @classmethod
+    def _join(cls, directory: Path, chunks: List[Path]) -> Path:
+        archive_head = chunks[0].stem
+        idx = archive_head.rfind('_')
+        result_file = directory.joinpath(archive_head[:idx] + '.' + archive_head[idx+1:])
+        chunks.sort()
+
+        with result_file.open('wb') as output_file:
+            for chunk_path in chunks:
+                with chunk_path.open('rb') as chunk_file:
+                    chunk = chunk_file.read()
+                output_file.write(chunk)
+        return result_file
+
+    @classmethod
+    def join(cls, directory: Path):
+        # group by file name
+        files = defaultdict(list)
+        for file in directory.iterdir():
+            files[file.stem].append(file)
+        for key, val in files.items():
+            if len(val) > 1:
+                print(cls._join(directory, val))
+
 
 if __name__ == '__main__':
-    s = '/home/agata/projects/pimeyes/arcface_torch/output/webface_r18_512'
-    CallbackModelSplitZipCheckpoint(0, s)()
+    # s = Path(__file__).parents[1].joinpath('output/webface_r18_512')
+    # CallbackModelSplitCheckpoint(0, str(s))()
+    dir = Path('/home/agata/projects/pimeyes/arcface_tests_warped/webface_r50_512')
+    CallbackModelSplitCheckpoint.join(dir)
