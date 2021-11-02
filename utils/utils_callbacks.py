@@ -1,8 +1,12 @@
 import logging
+import math
 import os
+import subprocess
 import time
+from collections import defaultdict
+from pathlib import Path
 from typing import List
-
+from zipfile import ZipFile
 import torch
 
 from eval import verification
@@ -26,11 +30,13 @@ class CallBackVerification(object):
             acc1, std1, acc2, std2, xnorm, embeddings_list = verification.test(
                 self.ver_list[i], backbone, 10, 10)
             logging.info('[%s][%d]XNorm: %f' % (self.ver_name_list[i], global_step, xnorm))
-            logging.info('[%s][%d]Accuracy-Flip: %1.5f+-%1.5f' % (self.ver_name_list[i], global_step, acc2, std2))
+            logging.info('[%s][%d]Accuracy-Flip: %1.5f+-%1.5f' % (
+            self.ver_name_list[i], global_step, acc2, std2))
             if acc2 > self.highest_acc_list[i]:
                 self.highest_acc_list[i] = acc2
             logging.info(
-                '[%s][%d]Accuracy-Highest: %1.5f' % (self.ver_name_list[i], global_step, self.highest_acc_list[i]))
+                '[%s][%d]Accuracy-Highest: %1.5f' % (
+                self.ver_name_list[i], global_step, self.highest_acc_list[i]))
             results.append(acc2)
 
     def init_dataset(self, val_targets, data_dir, image_size):
@@ -86,13 +92,13 @@ class CallBackLogging(object):
                     self.writer.add_scalar('learning_rate', learning_rate, global_step)
                     self.writer.add_scalar('loss', loss.avg, global_step)
                 if fp16:
-                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.4f   Epoch: %d   Global Step: %d   " \
+                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.7f   Epoch: %d   Global Step: %d   " \
                           "Fp16 Grad Scale: %2.f   Required: %1.f hours" % (
                               speed_total, loss.avg, learning_rate, epoch, global_step,
                               grad_scaler.get_scale(), time_for_end
                           )
                 else:
-                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.4f   Epoch: %d   Global Step: %d   " \
+                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.7f   Epoch: %d   Global Step: %d   " \
                           "Required: %1.f hours" % (
                               speed_total, loss.avg, learning_rate, epoch, global_step, time_for_end
                           )
@@ -122,3 +128,71 @@ class CallBackModelCheckpoint(object):
 
         if global_step > 100 and partial_fc is not None:
             partial_fc.save_params()
+
+
+class CallbackModelSplitCheckpoint:
+
+    @classmethod
+    def _remove_source_file(cls, source_file: Path):
+        source_file.unlink()
+
+    def _split(self, source_file: Path, destination_folder: Path):
+        archive_head = f'{source_file.stem}{source_file.suffix.replace(".", "_")}'
+
+        with source_file.open('rb') as input_file:
+            part_idx = 0
+            chunk = input_file.read(self.split_size)
+            while chunk:
+                chunk_file_path = destination_folder.joinpath(f'{archive_head}.{part_idx:03d}')
+                with chunk_file_path.open('wb') as chunk_file:
+                    chunk_file.write(chunk)
+                part_idx += 1
+                chunk = input_file.read(self.split_size)
+
+    def __init__(self, rank, output="./", split_size=90000000):
+        self.output = Path(output)
+        self.rank = rank
+        self.split_size = split_size
+
+    def _make_git_ignore(self):
+        with open(os.path.join(self.output, '.gitignore'), 'wt') as gitignore:
+            gitignore.write('*.pth\n')
+
+    def __call__(self):
+        if self.rank != 0:
+            return
+        self._make_git_ignore()
+        for file in Path(self.output).iterdir():
+            if file.suffix == '.pth':
+                self._split(file, self.output)
+
+    @classmethod
+    def _join(cls, directory: Path, chunks: List[Path]) -> Path:
+        archive_head = chunks[0].stem
+        idx = archive_head.rfind('_')
+        result_file = directory.joinpath(archive_head[:idx] + '.' + archive_head[idx+1:])
+        chunks.sort()
+
+        with result_file.open('wb') as output_file:
+            for chunk_path in chunks:
+                with chunk_path.open('rb') as chunk_file:
+                    chunk = chunk_file.read()
+                output_file.write(chunk)
+        return result_file
+
+    @classmethod
+    def join(cls, directory: Path):
+        # group by file name
+        files = defaultdict(list)
+        for file in directory.iterdir():
+            files[file.stem].append(file)
+        for key, val in files.items():
+            if len(val) > 1:
+                print(cls._join(directory, val))
+
+
+if __name__ == '__main__':
+    # s = Path(__file__).parents[1].joinpath('output/webface_r18_512')
+    # CallbackModelSplitCheckpoint(0, str(s))()
+    dir = Path('/home/agata/projects/pimeyes/arcface_tests_warped/webface_r50_512')
+    CallbackModelSplitCheckpoint.join(dir)

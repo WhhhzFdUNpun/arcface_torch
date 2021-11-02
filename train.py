@@ -14,7 +14,8 @@ from backbones import get_model
 from dataset import MXFaceDataset, SyntheticDataset, DataLoaderX
 from partial_fc import PartialFC
 from utils.utils_amp import MaxClipGradScaler
-from utils.utils_callbacks import CallBackVerification, CallBackLogging, CallBackModelCheckpoint
+from utils.utils_callbacks import (
+    CallBackVerification, CallBackLogging, CallBackModelCheckpoint, CallbackModelSplitCheckpoint)
 from utils.utils_config import get_config
 from utils.utils_logging import AverageMeter, init_logging
 from torch.distributed.elastic.multiprocessing.errors import record
@@ -52,7 +53,7 @@ def main(args):
 
     if cfg.resume:
         try:
-            backbone_pth = os.path.join(cfg.output, "backbone.pth")
+            backbone_pth = os.path.join(cfg.resume_file)
             backbone.load_state_dict(torch.load(backbone_pth, map_location=torch.device(local_rank)))
             if rank == 0:
                 logging.info("backbone resume successfully!")
@@ -134,7 +135,8 @@ def main(args):
             callback_verification(global_step, backbone)
             scheduler_backbone.step()
             scheduler_pfc.step()
-        callback_checkpoint(global_step, backbone, module_partial_fc)
+        callback_checkpoint(global_step, backbone, module_partial_fc, epoch)
+    CallbackModelSplitCheckpoint(rank, cfg.output)()
     dist.destroy_process_group()
 
 
