@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from typing import Any
 
 import cv2
 import numpy as np
@@ -29,7 +30,7 @@ def inference(weight, name, img):
 
 
 class ArcfacePredictor:
-    def __init__(self, model_name: str, weight: Path, device='cpu'):
+    def __init__(self, model_name: str, weight: Path, device: str='cpu', **kwargs: Any):
         """
 
         Args:
@@ -37,7 +38,7 @@ class ArcfacePredictor:
             weight:
             device:
         """
-        self.model = get_model(model_name, fp16=False)
+        self.model = get_model(model_name, fp16=False, **kwargs)
         self.model.load_state_dict(torch.load(weight))
         self.model.eval()
 
