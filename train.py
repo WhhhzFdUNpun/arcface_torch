@@ -11,7 +11,7 @@ import torch.backends.cudnn
 
 import losses
 from backbones import get_model
-from dataset import MXFaceDataset, SyntheticDataset, DataLoaderX
+from dataset import MXFaceAugmentedDataset, MXFaceDataset, SyntheticDataset, DataLoaderX
 from partial_fc import PartialFC
 from utils.utils_amp import MaxClipGradScaler
 from utils.utils_callbacks import (
@@ -43,7 +43,7 @@ def main(args):
     if cfg.rec == "synthetic":
         train_set = SyntheticDataset(local_rank=local_rank)
     else:
-        train_set = MXFaceDataset(root_dir=cfg.rec, local_rank=local_rank)
+        train_set = MXFaceAugmentedDataset(root_dir=cfg.rec, local_rank=local_rank)
 
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_set, shuffle=True)
     train_loader = DataLoaderX(
