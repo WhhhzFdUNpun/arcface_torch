@@ -1,4 +1,4 @@
-"""Helper for evaluation on the Labeled Faces in the Wild dataset 
+"""Helper for evaluation on the Labeled Faces in the Wild dataset
 """
 
 # MIT License
@@ -25,7 +25,6 @@
 
 
 import datetime
-import os
 import pickle
 
 import mxnet as mx
@@ -202,7 +201,7 @@ def load_bin(path, image_size):
     try:
         with open(path, 'rb') as f:
             bins, issame_list = pickle.load(f)  # py2
-    except UnicodeDecodeError as e:
+    except UnicodeDecodeError:
         with open(path, 'rb') as f:
             bins, issame_list = pickle.load(f, encoding='bytes')  # py3
     data_list = []
@@ -372,7 +371,8 @@ def test(data_set, backbone, batch_size, nfolds=10):
 #         all_layers = sym.get_internals()
 #         sym = all_layers['fc1_output']
 #         model = mx.mod.Module(symbol=sym, context=ctx, label_names=None)
-#         # model.bind(data_shapes=[('data', (args.batch_size, 3, image_size[0], image_size[1]))], label_shapes=[('softmax_label', (args.batch_size,))])
+#         # model.bind(data_shapes=[('data', (args.batch_size, 3, image_size[0], image_size[1]))],
+#         label_shapes=[('softmax_label', (args.batch_size,))])
 #         model.bind(data_shapes=[('data', (args.batch_size, 3, image_size[0],
 #                                           image_size[1]))])
 #         model.set_params(arg_params, aux_params)

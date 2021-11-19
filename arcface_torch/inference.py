@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import torchvision.transforms as tt
 
-from backbones import get_model
+from arcface_torch.backbones import get_model
 
 
 @torch.no_grad()
@@ -30,7 +30,7 @@ def inference(weight, name, img):
 
 
 class ArcfacePredictor:
-    def __init__(self, model_name: str, weight: Path, device: str='cpu', **kwargs: Any):
+    def __init__(self, model_name: str, weight: Path, device: str = 'cpu', **kwargs: Any) -> None:
         """
 
         Args:

@@ -9,8 +9,8 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from backbones import get_model
-from eval import verification
+from arcface_torch.backbones import get_model
+from arcface_torch.eval import verification
 
 
 def make_bins(source_directory_path: str, destination_folder: str, filename: str, batch_size=30000):
@@ -95,24 +95,3 @@ def evaluate(verification_set_path, image_size):
     backbone.eval()
     # backbone.to('cpu')
     verification.test(data_set, backbone, batch_size, folds)
-
-
-def run_make_bin(split, shall_make_bins=True, shall_make_negative_bins=True):
-    source = f'/home/agata/projects/face_search/storage/datasets/CASIA-WebFaces_warped/normalized_images/{split}'
-    destination_folder = f'/home/agata/projects/face_search/storage/datasets/CASIA-WebFaces_warped/normalized_mxnet'
-    destinations = []
-    if shall_make_bins:
-        destinations.extend(make_bins(source, destination_folder, split))
-    if shall_make_negative_bins:
-        destinations.append(make_negative_bin(source, destination_folder, split))
-    return destinations
-
-
-def test_with_agedb():
-    path = '/home/agata/projects/images/faces_webface_112x112/agedb_30.bin'
-    image_size = (112, 112)
-    evaluate(path, image_size)
-
-
-if __name__ == '__main__':
-    run_make_bin('test', shall_make_bins=False)

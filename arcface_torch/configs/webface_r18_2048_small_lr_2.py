@@ -9,7 +9,8 @@ from easydict import EasyDict as edict
 config = edict()
 config.loss = "arcface"
 config.network = "r18"
-config.resume = False
+config.resume = True
+config.resume_file = '/pretrained/backbone_phase1.pth'
 config.output = f"/output/{Path(__file__).resolve().stem}"
 
 config.dataset = "webface"
@@ -19,14 +20,12 @@ config.fp16 = False
 config.momentum = 0.9
 config.weight_decay = 5e-4
 config.batch_size = 32
-config.lr = 1  # batch size is 512
+config.lr = 0.1  # batch size is 512
 
 config.rec = "/data"
 config.num_classes = 10572
 config.num_image = "forget"
-config.num_epoch = 50
+config.num_epoch = 30
 config.warmup_epoch = -1
-config.decay_epoch = [30]
+config.decay_epoch = []
 config.val_targets = ["agedb_30", "dev_00", "dev_04"]
-
-print(config.output)

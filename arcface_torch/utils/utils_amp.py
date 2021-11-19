@@ -47,8 +47,8 @@ class MaxClipGradScaler(GradScaler):
         """
         Multiplies ('scales') a tensor or list of tensors by the scale factor.
 
-        Returns scaled outputs.  If this instance of :class:`GradScaler` is not enabled, outputs are returned
-        unmodified.
+        Returns scaled outputs.  If this instance of :class:`GradScaler` is not enabled,
+        outputs are returned unmodified.
 
         Arguments:
             outputs (Tensor or iterable of Tensors):  Outputs to scale.
@@ -65,7 +65,8 @@ class MaxClipGradScaler(GradScaler):
             return outputs * self._scale.to(device=outputs.device, non_blocking=True)
 
         # Invoke the more complex machinery only if we're treating multiple outputs.
-        stash: List[_MultiDeviceReplicator] = []  # holds a reference that can be overwritten by apply_scale
+        stash: List[_MultiDeviceReplicator] = []
+        # holds a reference that can be overwritten by apply_scale
 
         def apply_scale(val):
             if isinstance(val, torch.Tensor):

@@ -12,7 +12,7 @@ rabbitUri = ''
 PS_JOB_NAME = "ps"
 WORKER_JOB_NAME = "worker"
 os.environ['NCCL_DEBUG'] = 'WARN'
-os.environ['NCCL_SOCKET_IFNAME']="eth0"
+os.environ['NCCL_SOCKET_IFNAME'] = "eth0"
 
 
 def configure_parse_arguments():
@@ -84,7 +84,8 @@ def entry(
     nproc_per_node=None,
     config_file='webface_r18_512',
 ) -> None:
-    print(f"entry: datasets {datasets} , checkpoint_path {checkpoint_path}, nproc_per_node {nproc_per_node}" )
+    print(f"entry: datasets {datasets} , checkpoint_path {checkpoint_path}, "
+          f"nproc_per_node {nproc_per_node}")
 
     FLAGS.ps_hosts = os.environ['PS_HOSTS']
     FLAGS.worker_hosts = os.environ['WORKER_HOSTS']

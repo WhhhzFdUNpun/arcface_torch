@@ -1,14 +1,13 @@
 # coding: utf-8
 
 import os
-from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from menpo.visualize.viewmatplotlib import sample_colours_from_colourmap
 from prettytable import PrettyTable
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import auc, roc_curve
 
 image_path = "/data/anxiang/IJB_release/IJBC"
 files = [

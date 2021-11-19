@@ -3,22 +3,22 @@ import logging
 import os
 
 import torch
+import torch.backends.cudnn
 import torch.distributed as dist
 import torch.nn.functional as F
 import torch.utils.data.distributed
-from torch.nn.utils import clip_grad_norm_
-import torch.backends.cudnn
-
-import losses
-from backbones import get_model
-from dataset import MXFaceAugmentedDataset, MXFaceDataset, SyntheticDataset, DataLoaderX
-from partial_fc import PartialFC
-from utils.utils_amp import MaxClipGradScaler
-from utils.utils_callbacks import (
-    CallBackVerification, CallBackLogging, CallBackModelCheckpoint, CallbackModelSplitCheckpoint)
-from utils.utils_config import get_config
-from utils.utils_logging import AverageMeter, init_logging
 from torch.distributed.elastic.multiprocessing.errors import record
+from torch.nn.utils import clip_grad_norm_
+
+import arcface_torch.losses as losses
+from arcface_torch.backbones import get_model
+from arcface_torch.dataset import DataLoaderX, MXFaceAugmentedDataset, SyntheticDataset
+from arcface_torch.partial_fc import PartialFC
+from arcface_torch.utils.utils_amp import MaxClipGradScaler
+from arcface_torch.utils.utils_callbacks import (
+    CallBackLogging, CallBackModelCheckpoint, CallBackVerification, CallbackModelSplitCheckpoint)
+from arcface_torch.utils.utils_config import get_config
+from arcface_torch.utils.utils_logging import AverageMeter, init_logging
 
 
 @record

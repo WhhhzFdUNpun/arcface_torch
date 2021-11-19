@@ -1,16 +1,14 @@
 import logging
-import math
 import os
-import subprocess
 import time
 from collections import defaultdict
 from pathlib import Path
 from typing import List
-from zipfile import ZipFile
+
 import torch
 
-from eval import verification
-from utils.utils_logging import AverageMeter
+from arcface_torch.eval import verification
+from arcface_torch.utils.utils_logging import AverageMeter
 
 
 class CallBackVerification(object):
@@ -31,12 +29,12 @@ class CallBackVerification(object):
                 self.ver_list[i], backbone, 10, 10)
             logging.info('[%s][%d]XNorm: %f' % (self.ver_name_list[i], global_step, xnorm))
             logging.info('[%s][%d]Accuracy-Flip: %1.5f+-%1.5f' % (
-            self.ver_name_list[i], global_step, acc2, std2))
+                self.ver_name_list[i], global_step, acc2, std2))
             if acc2 > self.highest_acc_list[i]:
                 self.highest_acc_list[i] = acc2
             logging.info(
                 '[%s][%d]Accuracy-Highest: %1.5f' % (
-                self.ver_name_list[i], global_step, self.highest_acc_list[i]))
+                    self.ver_name_list[i], global_step, self.highest_acc_list[i]))
             results.append(acc2)
 
     def init_dataset(self, val_targets, data_dir, image_size):
@@ -92,14 +90,14 @@ class CallBackLogging(object):
                     self.writer.add_scalar('learning_rate', learning_rate, global_step)
                     self.writer.add_scalar('loss', loss.avg, global_step)
                 if fp16:
-                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.7f   Epoch: %d   Global Step: %d   " \
-                          "Fp16 Grad Scale: %2.f   Required: %1.f hours" % (
+                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.7f   Epoch: %d   " \
+                          "Global Step: %d  Fp16 Grad Scale: %2.f   Required: %1.f hours" % (
                               speed_total, loss.avg, learning_rate, epoch, global_step,
                               grad_scaler.get_scale(), time_for_end
                           )
                 else:
-                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.7f   Epoch: %d   Global Step: %d   " \
-                          "Required: %1.f hours" % (
+                    msg = "Speed %.2f samples/sec   Loss %.4f   LearningRate %.7f   Epoch: %d   " \
+                          "Global Step: %d  Required: %1.f hours" % (
                               speed_total, loss.avg, learning_rate, epoch, global_step, time_for_end
                           )
                 logging.info(msg)
@@ -189,10 +187,3 @@ class CallbackModelSplitCheckpoint:
         for key, val in files.items():
             if len(val) > 1:
                 print(cls._join(directory, val))
-
-
-if __name__ == '__main__':
-    # s = Path(__file__).parents[1].joinpath('output/webface_r18_512')
-    # CallbackModelSplitCheckpoint(0, str(s))()
-    dir = Path('/home/agata/projects/pimeyes/arcface_tests_warped/webface_r50_512')
-    CallbackModelSplitCheckpoint.join(dir)

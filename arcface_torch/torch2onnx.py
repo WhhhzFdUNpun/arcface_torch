@@ -14,7 +14,8 @@ def convert_onnx(net, path_module, output, opset=11, simplify=False):
     weight = torch.load(path_module)
     net.load_state_dict(weight)
     net.eval()
-    torch.onnx.export(net, img, output, keep_initializers_as_inputs=False, verbose=False, opset_version=opset)
+    torch.onnx.export(
+        net, img, output, keep_initializers_as_inputs=False, verbose=False, opset_version=opset)
     model = onnx.load(output)
     graph = model.graph
     graph.input[0].type.tensor_type.shape.dim[0].dim_param = 'None'
@@ -24,11 +25,12 @@ def convert_onnx(net, path_module, output, opset=11, simplify=False):
         assert check, "Simplified ONNX model could not be validated"
     onnx.save(model, output)
 
-    
+
 if __name__ == '__main__':
     import os
     import argparse
-    from backbones import get_model
+
+    from arcface_torch.backbones import get_model
 
     parser = argparse.ArgumentParser(description='ArcFace PyTorch to onnx')
     parser.add_argument('input', type=str, help='input backbone.pth file or path')
