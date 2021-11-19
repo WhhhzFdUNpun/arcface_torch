@@ -122,3 +122,30 @@ class SyntheticDataset(Dataset):
 
     def __len__(self):
         return 1000000
+
+
+class MXFaceAugmentedDataset(MXFaceDataset):
+    def __init__(self, root_dir, local_rank, multiplier: int = 4):
+        super(MXFaceAugmentedDataset, self).__init__(root_dir, local_rank)
+        self.multiplier = multiplier
+        self.transform = transforms.Compose([
+            transforms.ToPILImage(),
+            transforms.RandomHorizontalFlip(),
+            transforms.ColorJitter(),
+            transforms.RandomGrayscale(),
+            transforms.RandomEqualize(),
+            transforms.RandomAutocontrast(),
+            transforms.RandomAdjustSharpness(sharpness_factor=2),
+            transforms.RandomInvert(),
+            transforms.RandomSolarize(threshold=200),
+            transforms.RandomPosterize(bits=2),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+        ])
+
+    def __getitem__(self, index):
+        index_no_augmentation = index % len(self.imgidx)
+        return super().__getitem__(index_no_augmentation)
+
+    def __len__(self):
+        return self.multiplier * len(self.imgidx)
