@@ -2,3 +2,4 @@
 output/
 /configs/*_local.py
 __pycache__/
+ arcface_torch.egg-info/
